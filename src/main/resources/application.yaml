@@ -3,5 +3,7 @@ ktor:
     modules:
       - com.example.ApplicationKt.module
   deployment:
-    port: 8080
-    host: 192.168.1.19
+    port: 8000
+#spring:
+#  datasource:
+#    url: jdbc:h2:file:./y4i-server/data

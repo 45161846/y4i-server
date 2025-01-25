@@ -1,29 +1,41 @@
-@file:Suppress("ktlint:standard:no-wildcard-imports")
-
 package com.example.db
 
+import com.example.db.UserService.Users
+import com.example.wrappers.Credentials
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.Serializable
+import org.jetbrains.exposed.dao.IntEntity
+import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 
-@Serializable
-data class ExposedUser(
-    val name: String,
-    val email: String,
+class UserDAO(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<UserDAO>(Users)
+
+    var login by Users.login
+    var email by Users.email
+    var password by Users.password
+}
+
+fun daoToModel(dao: UserDAO) = Credentials.Valid(
+    dao.login,
+    dao.email,
+    dao.password
 )
+
+suspend fun <T> dbQuery(block: suspend () -> T): T = newSuspendedTransaction(Dispatchers.IO) { addLogger(StdOutSqlLogger);block() }
 
 class UserService(
     private val database: Database,
 ) {
-    object Users : Table() {
-        val id = integer("id").autoIncrement()
-        val name = varchar("user-name", length = 50)
-        val email = varchar("user-email", length = 50)
-
-        override val primaryKey = PrimaryKey(id)
+    object Users : IntIdTable("created-users") {
+        val login = varchar("user-name", length = 18)
+        val email = varchar("user-email", length = 100)
+        val password = varchar("password", length = 30)
     }
 
     init {
@@ -32,33 +44,38 @@ class UserService(
         }
     }
 
-    suspend fun <T> dbQuery(block: suspend () -> T): T = newSuspendedTransaction(Dispatchers.IO) { block() }
 
-    suspend fun create(user: ExposedUser): Int =
+    suspend fun create(credentials: Credentials.Valid): Int =
         dbQuery {
             Users.insert {
-                it[name] = user.name
-                it[email] = user.email
+                it[login] = credentials.login
+                it[email] = credentials.email
+                it[password] = credentials.password
             }[Users.id]
-        }
+        }.value
 
-    suspend fun read(id: Int): ExposedUser? =
+    suspend fun findByEmail(email: String): Credentials? =
         dbQuery {
             Users
                 .selectAll()
-                .where { Users.id eq id }
-                .map { ExposedUser(it[Users.name], it[Users.email]) }
+                .where { Users.email eq email }
+                .map { Credentials.Valid(
+                    it[Users.login],
+                    it[Users.email],
+                    it[Users.password]
+                ) }
                 .singleOrNull()
         }
 
     suspend fun update(
         id: Int,
-        user: ExposedUser,
+        credentials: Credentials.Valid,
     ) {
         dbQuery {
             Users.update({ Users.id eq id }) {
-                it[name] = user.name
-                it[email] = user.email
+                it[login] = credentials.login
+                it[email] = credentials.email
+                it[password] = credentials.password
             }
         }
     }

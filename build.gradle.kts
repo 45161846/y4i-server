@@ -1,6 +1,7 @@
 val kotlin_version: String by project
 val logback_version: String by project
 val exposedVersion: String by project
+val h2Version: String by project
     plugins {
     kotlin("jvm") version "2.1.0"
     id("io.ktor.plugin") version "3.0.2"
@@ -45,4 +46,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-json:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-money:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-spring-boot-starter:$exposedVersion")
+    implementation("com.h2database:h2:$h2Version")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+    implementation("org.postgresql:postgresql:42.2.10")
 }
