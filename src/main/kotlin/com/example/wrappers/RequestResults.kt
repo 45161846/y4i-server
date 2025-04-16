@@ -47,4 +47,47 @@ sealed class RequestResult {
             val errorMessage: String
         ): CreateAccount()
     }
+
+    @Serializable
+    sealed class PlaylistPage{
+
+        @Serializable
+        @SerialName("playlist-page-data")
+        data class Data(
+            val playlists: List<RemotePlaylist>
+        ) : PlaylistPage()
+
+        @Serializable
+        @SerialName("noting-more")
+        data object NotingMore : PlaylistPage()
+
+        @Serializable
+        @SerialName("error")
+        data class Error(val message: String) : PlaylistPage()
+
+    }
+
+    @Serializable
+    sealed class RemoteTasks{
+
+        @Serializable
+        @SerialName("remote-tasks")
+        data class Tasks(
+            val data: List<PreviewTask>
+        ): RemoteTasks()
+
+        data object Error: RemoteTasks()
+
+    }
+
+    @Serializable
+    sealed class TaskDownload {
+
+        @Serializable
+        data class Data(
+            val text: String
+        ) : TaskDownload()
+
+        data object Error : TaskDownload()
+    }
 }

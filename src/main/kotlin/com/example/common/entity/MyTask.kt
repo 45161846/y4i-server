@@ -2,9 +2,17 @@ package com.example.common.entity
 
 import com.example.common.Id
 import com.example.common.TaskType
+import kotlinx.serialization.Serializable
 
-class MyTask(
+@Serializable
+class PreviewTask(
     val value: String,
+    val type: TaskType,
+)
+
+class FullTask(
+    val preview: String,
+    val formatedData: String,
     val type: TaskType,
 )
 

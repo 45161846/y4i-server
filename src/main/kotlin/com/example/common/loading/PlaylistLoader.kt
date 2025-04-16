@@ -2,8 +2,7 @@ package com.example.common.loading
 
 import com.example.common.Id
 import com.example.common.TaskType
-import com.example.common.entity.MyTask
-import com.example.common.entity.Playlist
+import com.example.common.entity.FullTask
 import com.example.wrappers.RemotePlaylist
 import java.io.File
 
@@ -31,13 +30,13 @@ class PlaylistLoader(
             title = parts[0],
             description = parts[1],
             rating = parts[2].toFloat(),
-            capacity = parts[3].toInt(),
+            capacity = lines.size - 2,
             previewTasks = preview.subList(0, 3.coerceAtMost(preview.size))
         )
 
     }
 
-    fun createTasksFromFile(fileName: String): List<MyTask> {
+    fun createTasksFromFile(fileName: String): List<FullTask> {
         val lines = File(fileName).readLines()
         val taskLines = lines.subList(2, lines.size)
 
@@ -47,8 +46,10 @@ class PlaylistLoader(
             }
             .map {
             val parts = it.split(";")
-            MyTask(
-                parts[0], TaskType.valueOf(parts[1])
+            FullTask(
+                preview =  parts[0],
+                formatedData = parts.slice(1..2).joinToString(";"),
+                type = TaskType.valueOf(parts.last())
             )
         }
     }

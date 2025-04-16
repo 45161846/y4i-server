@@ -1,8 +1,12 @@
 package com.example.db
 
 import com.example.common.Id
+import com.example.db.PlaylistService.Playlists.select
 import com.example.db.PlaylistService.Playlists.title
 import com.example.db.schema.PreviewTaskSchema
+import com.example.db.schema.PreviewTaskSchema.PreviewTaskTable.playlistId
+import com.example.db.schema.PreviewTaskSchema.PreviewTaskTable.previewTask
+import com.example.wrappers.PreviewTask
 import com.example.wrappers.RemotePlaylist
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.*
@@ -39,6 +43,9 @@ class PlaylistService(
             }[Playlists.id].value
 
             for (preview in playlist.previewTasks) {
+                if(preview.isBlank()){
+                    continue
+                }
                 previewService.addPreviewTask(preview, id)
             }
 
@@ -50,8 +57,9 @@ class PlaylistService(
 
             val previewService = PreviewTaskSchema(database)
 
-            Playlists
+            val emptyPlaylists = Playlists
                 .selectAll()
+
                 .map {
                     val id = it[Playlists.id].value
 
@@ -67,9 +75,30 @@ class PlaylistService(
                     val preview = previewService.getPreviewTask(id)
 
                     playlist.copy(
-                        previewTasks = preview.map { it.text }
+                        previewTasks = preview.map { it.previewText }
                     )
                 }
+
+            val previewTasks = PreviewTaskSchema.PreviewTaskTable
+                .selectAll()
+                .map{
+                    PreviewTask(
+                        Id(it[PreviewTaskSchema.PreviewTaskTable.id].value),
+                        it[previewTask]
+                    )
+                }
+                .groupBy{
+                    it.remoteId
+                }
+
+
+            emptyPlaylists.map{
+                it.copy(
+                    previewTasks = previewTasks[it.remoteId]?.map { task ->
+                        task.previewText
+                    } ?: emptyList()
+                )
+            }
         }
 
     suspend fun takeAfter(after: Int, amount: Int): List<RemotePlaylist> =
@@ -104,7 +133,7 @@ class PlaylistService(
         val preview = previewService.getPreviewTask(id)
 
         return playlist.copy(
-            previewTasks = preview.map { it.text }
+            previewTasks = preview.map { it.previewText }
         )
     }
 }

@@ -2,7 +2,7 @@ package com.example.common.mappers
 
 import com.example.common.Id
 import com.example.common.TaskType
-import com.example.common.entity.MyTask
+import com.example.common.entity.PreviewTask as MyTask
 import com.example.common.entity.PartOfTask
 
 class FormatToMyTaskMapper {

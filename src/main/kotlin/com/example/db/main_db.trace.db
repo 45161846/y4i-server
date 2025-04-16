@@ -1,0 +1,9 @@
+2025-03-20 17:33:44 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "TASKPLAYLISTCROSSREF" not found (this database is empty); SQL statement:
+DELETE FROM TASKPLAYLISTCROSSREF [42104-214]
+2025-03-20 17:33:44 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "TASKPLAYLISTCROSSREF" not found (this database is empty); SQL statement:
+DELETE FROM TASKPLAYLISTCROSSREF [42104-214]
+2025-03-20 17:33:44 jdbc[5]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "TASKPLAYLISTCROSSREF" not found (this database is empty); SQL statement:
+DELETE FROM TASKPLAYLISTCROSSREF [42104-214]

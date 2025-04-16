@@ -1,5 +1,6 @@
 package com.example.db.schema
 
+import com.example.common.Id
 import com.example.db.dbQuery
 import com.example.wrappers.PreviewTask
 import org.jetbrains.exposed.dao.id.LongIdTable
@@ -42,8 +43,8 @@ class PreviewTaskSchema(
                 PreviewTaskTable.playlistId eq id
             }.map {
                 PreviewTask(
-                    id = id,
-                    text = it[PreviewTaskTable.previewTask]
+                    remoteId = Id(id),
+                    previewText = it[PreviewTaskTable.previewTask]
                 )
             }
     }
